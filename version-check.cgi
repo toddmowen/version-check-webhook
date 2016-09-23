@@ -5,6 +5,10 @@
 
 require 'octokit'
 require 'base64'
+require 'logger'
+
+logger = Logger.new(STDERR)
+logger.level = Logger::INFO
 
 repo = ARGV[0]
 base_ref = ARGV[1]
@@ -25,14 +29,17 @@ end
 b = get_version(repo, base_ref)
 h = get_version(repo, head_ref)
 
+logger.info("Base version: #{b.join('.')}")
+logger.info("Head version: #{h.join('.')}")
+
 if b == h
-    puts "No version bump"
+    logger.info("No version bump")
 elsif b[0] == h[0] && b[1] == h[1] && b[2]+1 == h[2]
-    puts "Third component bump"
+    logger.info("Third component bump")
 elsif b[0] == h[0] && b[1]+1 == h[1] && h[2] == 0
-    puts "Second component bump"
+    logger.info("Second component bump")
 elsif b[0]+1 == h[0] && h[1] == 0 && h[2] == 0
-    puts "First component bump"
+    logger.info("First component bump")
 else
-    puts "Invalid version change"
+    logger.error("Invalid version change")
 end
